@@ -10,14 +10,13 @@ call print16
 call print16_nl
 
 call load_kernel ; read the kernel from disk
-call switch_to_32bit ; disable interrupts, load GDT,  etc. Finally jumps to 'BEGIN_PM'
+
 jmp $ ; Never executed
 
 %include "boot/print-16bit.asm"
 %include "boot/print-32bit.asm"
 %include "boot/disk.asm"
 %include "boot/gdt.asm"
-%include "boot/switch-to-32bit.asm"
 
 [bits 16]
 load_kernel:
@@ -30,13 +29,6 @@ load_kernel:
     mov dl, [BOOT_DRIVE]
     call disk_load
     ret
-
-[bits 32]
-BEGIN_32BIT:
-    mov ebx, MSG_32BIT_MODE
-    call print32
-    call KERNEL_OFFSET ; Give control to the kernel
-    jmp $ ; Stay here when the kernel returns control to us (if ever)
 
 
 BOOT_DRIVE db 0 ; It is a good idea to store it in memory because 'dl' may get overwritten
